@@ -30,7 +30,7 @@ const LoginScreen = ({ navigation }) => {
             />
             <TextInput
                 style={styles.input}
-                placeholder="Password"
+                placeholder="Passwords"
                 secureTextEntry
                 onChangeText={(text) => setPassword(text)}
             />
