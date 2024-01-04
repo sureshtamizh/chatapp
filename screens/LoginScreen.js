@@ -1,23 +1,49 @@
-// LoginScreen.js
-
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
+
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { doLogin } from '../services';
+import { setDataToStorage } from '../constants/storage';
+
 
 const LoginScreen = ({ navigation }) => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
 
-    const handleLogin = () => {
-        // Implement your authentication logic here
-        // For simplicity, we're just logging the credentials for now
-        console.log('Username:', username);
-        console.log('Password:', password);
+    const validateCredentials = () => {
+        const emailRegex = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/;
 
-        // You can add your authentication logic here
-        // For example, check credentials against a server, etc.
+        if (!emailRegex.test(username)) {
+            Alert.alert('Invalid Email', 'Please enter a valid email address');
+            return false;
+        } else if (password.length < 6) {
+            Alert.alert('Invalid Password', 'Please enter a password with at least 6 characters');
+            return false;
+        }
 
-        // For now, let's navigate to a home screen after login
-        navigation.navigate('Home');
+        return true;
+    };
+
+    const handleLogin = async () => {
+        if (!validateCredentials()) {
+            return;
+        }
+        try {
+            const params = {
+                email: username,
+                password: password,
+            };
+            const responseJson = await doLogin(params);
+            if (responseJson.data.statusCode === 200) {
+                console.log(JSON.stringify(responseJson.data))
+                setDataToStorage('TOKEN_KEY', responseJson.data.jwtToken);
+            } else {
+                Alert.alert('Login Failed', responseJson.data.message);
+            }
+        } catch (error) {
+            console.error('Login Error:', error);
+            Alert.alert('Error', 'Something went wrong. Please try again.');
+        }
     };
 
     return (
@@ -30,7 +56,7 @@ const LoginScreen = ({ navigation }) => {
             />
             <TextInput
                 style={styles.input}
-                placeholder="Passwords"
+                placeholder="Password"
                 secureTextEntry
                 onChangeText={(text) => setPassword(text)}
             />
