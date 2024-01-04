@@ -37,6 +37,7 @@ const LoginScreen = ({ navigation }) => {
             if (responseJson.data.statusCode === 200) {
                 console.log(JSON.stringify(responseJson.data))
                 setDataToStorage('TOKEN_KEY', responseJson.data.jwtToken);
+                navigation.navigate("chat");
             } else {
                 Alert.alert('Login Failed', responseJson.data.message);
             }
