@@ -5,9 +5,11 @@ import { View, Text, StyleSheet } from 'react-native';
 const Messages = ({ sender, content, timestamp }) => {
     return (
         <View style={styles.messageContainer}>
-            <Text style={styles.sender}>{sender}</Text>
+            <View style={styles.title}>
+                <Text style={styles.sender}>{sender}</Text>
+                <Text style={styles.timestamp}>{timestamp}</Text>
+            </View>
             <Text style={styles.content}>{content}</Text>
-            <Text style={styles.timestamp}>{timestamp}</Text>
         </View>
     );
 };
@@ -31,6 +33,11 @@ const styles = StyleSheet.create({
         color: '#999',
         marginTop: 5,
     },
+    title: {
+        flex: 1,
+        flexDirection: 'row',
+        justifyContent: 'space-between'
+    }
 });
 
 export default Messages;

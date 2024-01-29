@@ -1,26 +1,40 @@
 // ChatList.js
-import React from 'react';
-import { FlatList, View, StyleSheet } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { FlatList, View, StyleSheet, Alert, TouchableOpacity } from 'react-native';
 import Messages from './Messages';
+import { getChatList } from '../../services';
 
+const ChatList = ({ navigation }) => {
+    const [chatData, setChatData] = useState([]);
 
-const ChatList = () => {
-    const chatData = [
-        { id: '1', sender: 'John', content: 'Hello there!', timestamp: '10:30 AM' },
-        { id: '2', sender: 'Alice', content: 'Hi John!', timestamp: '10:32 AM' },
-        // Add more messages as needed
-    ];
+    useEffect(() => {
+        fetchChatList();
+    }, []);
+
+    const fetchChatList = async () => {
+        try {
+            let params = {
+            };
+            const responseJson = await getChatList(params);
+            console.log(JSON.stringify(responseJson.data))
+            setChatData(responseJson.data.memberChatList)
+
+        } catch (error) {
+            Alert.alert('Error', 'Something went wrong. Please try again.');
+        }
+    };
 
     return (
-        <View style={styles.container}>
+        <TouchableOpacity style={styles.container} onPress={() => navigation.navigate("chatdtls")}>
             <FlatList
                 data={chatData}
-                keyExtractor={(item) => item.id}
+                keyExtractor={(item) => item.memberId.toString()}  // Assuming 'id' is a number; adjust accordingly
                 renderItem={({ item }) => (
-                    <Messages sender={item.sender} content={item.content} timestamp={item.timestamp} />
+                    <Messages sender={item.memberName} content={item.chatLastText} timestamp={item.chatCreatedOnlyTime} />
                 )}
+                showsVerticalScrollIndicator={false}
             />
-        </View>
+        </TouchableOpacity>
     );
 };
 

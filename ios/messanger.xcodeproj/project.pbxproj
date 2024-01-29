@@ -114,7 +114,6 @@
 				E252739D86E56626F2D393B2 /* Pods-messanger-messangerTests.debug.xcconfig */,
 				7CE02C347E16CF6890897739 /* Pods-messanger-messangerTests.release.xcconfig */,
 			);
-			name = Pods;
 			path = Pods;
 			sourceTree = "<group>";
 		};
@@ -485,6 +484,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = GQ49G278T6;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = messanger/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -511,6 +511,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = GQ49G278T6;
 				INFOPLIST_FILE = messanger/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
