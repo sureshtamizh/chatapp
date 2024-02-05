@@ -1,92 +1,143 @@
-import React, { useRef, useState } from 'react';
-import { View, Text, FlatList, StyleSheet, TextInput, TouchableOpacity, KeyboardAvoidingView, TouchableWithoutFeedback, Keyboard } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { View, Text, FlatList, StyleSheet, TextInput, TouchableOpacity, KeyboardAvoidingView, TouchableWithoutFeedback, Keyboard, Alert, ScrollView } from 'react-native';
 import { COLORS } from '../../constants/COLOR';
-
-// Dummy data for testing
-const messageDetailsData = [
-    { "id": "1", "sender": "John", "content": "Hello!", "timestamp": "10:30 AM" },
-    { "id": "2", "sender": "User", "content": "Hi there!", "timestamp": "11:00 AM" },
-    { "id": "3", "sender": "User", "content": "How are you?", "timestamp": "11:15 AM" },
-    { "id": "4", "sender": "John", "content": "I'm doing well, thanks!", "timestamp": "11:30 AM" },
-    { "id": "5", "sender": "User", "content": "That's great to hear!", "timestamp": "11:45 AM" },
-    { "id": "6", "sender": "User", "content": "What have you been up to?What have you been up to?What have you been up to?What have you been up to?What have you been up to?What have you been up to?What have you been up to?What have you been up to?What have you been up to?What have you been up to?What have you been up to?What have you been up to?What have you been up to?What have you been up to?What have you been up to?What have you been up to?", "timestamp": "12:00 PM" },
-    { "id": "7", "sender": "John", "content": "Just relaxing and catching up on some work.", "timestamp": "12:15 PM" },
-    { "id": "8", "sender": "User", "content": "Nice! I'm working on a project too.", "timestamp": "12:30 PM" },
-    { "id": "9", "sender": "John", "content": "Tell me more about your project.", "timestamp": "01:00 PM" },
-    { "id": "10", "sender": "User", "content": "It's a mobile app for tracking expenses.", "timestamp": "01:30 PM" },
-    { "id": "11", "sender": "John", "content": "That sounds interesting! How is it going?", "timestamp": "02:00 PM" },
-    { "id": "12", "sender": "User", "content": "It's going well. I'm adding some new features.", "timestamp": "02:30 PM" },
-    { "id": "13", "sender": "John", "content": "Good to hear! Any challenges you're facing?", "timestamp": "03:00 PM" },
-    { "id": "14", "sender": "User", "content": "Not major ones. Just fine-tuning the UI.", "timestamp": "03:30 PM" },
-    { "id": "15", "sender": "John", "content": "UI is crucial. Are you using any specific libraries?", "timestamp": "04:00 PM" },
-    { "id": "16", "sender": "User", "content": "Yes, I'm using React Native for the frontend.", "timestamp": "04:30 PM" },
-    { "id": "17", "sender": "John", "content": "Great choice! How about the backend?", "timestamp": "05:00 PM" },
-    { "id": "18", "sender": "User", "content": "I'm using Node.js with Express for the backend.", "timestamp": "05:30 PM" },
-    { "id": "19", "sender": "John", "content": "Solid stack! Anything else you'd like to discuss about the project?", "timestamp": "06:00 PM" },
-    { "id": "20", "sender": "User", "content": "Not at the moment. Let's grab a coffee sometime and chat more.", "timestamp": "06:30 PM" },
-    { "id": "21", "sender": "John", "content": "Sure! I'm up for it. Just let me know when.", "timestamp": "07:00 PM" },
-    { "id": "22", "sender": "User", "content": "Sounds good. Have a great day!", "timestamp": "07:30 PM" },
-    { "id": "23", "sender": "John", "content": "You too! Take care.", "timestamp": "08:00 PM" },
-    { "id": "24", "sender": "User", "content": "Goodbye!", "timestamp": "08:30 PM" },
-    { "id": "25", "sender": "John", "content": "Goodbye!", "timestamp": "09:00 PM" },
-    { "id": "26", "sender": "User", "content": "See you soon!", "timestamp": "09:30 PM" },
-    { "id": "27", "sender": "John", "content": "Looking forward to it. Bye!", "timestamp": "10:00 PM" },
-    { "id": "28", "sender": "User", "content": "Bye!", "timestamp": "10:30 PM" },
-    { "id": "29", "sender": "John", "content": "Take care!", "timestamp": "11:00 PM" },
-    { "id": "30", "sender": "User", "content": "You too!", "timestamp": "11:30 PM" }
-]
-
-
+import { getChatDetailsList } from '../../services';
+import axios from 'axios';
+import Pusher from 'pusher-js/react-native';
+import { getDataFromStorage } from '../../constants/storage';
+import { useRoute } from '@react-navigation/native';
 
 
 
 const ChatDetails = () => {
     const [msg, setMsg] = useState([]);
     const textInputRef = useRef(null);
+    const [chatData, setChatData] = useState([]);
+    const [Messages, setMessages] = useState([]);
+    const route = useRoute();
+    const { recepientId } = route.params;
 
-    const handleSendPress = () => {
-        // Handle sending logic here
+    const [userId, setUserId] = useState();
+    const [receiverId, setreceiverId] = useState(recepientId);
 
-        // After sending, focus on the TextInput again
-        if (textInputRef.current) {
-            textInputRef.current.focus();
+    const scrollViewRef = useRef(null);
+
+    useEffect(() => {
+        scrollToBottom()
+    }, []);
+
+    const scrollToBottom = () => {
+        if (scrollViewRef.current) {
+            scrollViewRef.current.scrollToEnd({ animated: false })
+        }
+    }
+
+    const handleContentSizeChange = () => {
+        scrollToBottom();
+    }
+
+    const fetchMessages = async () => {
+        try {
+            const userId = await getDataFromStorage('USER_ID');
+            setUserId(userId)
+
+            const pusher = new Pusher('976372772d32501ae512', {
+                cluster: 'ap2'
+            });
+            const channel = pusher.subscribe('chat');
+
+            channel.bind('message', (data) => {
+                console.log(data)
+                fetchMessages()
+            });
+
+            let params = { "recepientId": recepientId, "senderId": userId }
+            console.log(params);
+
+            axios
+                .post("http://localhost:8000/getMessages", params)
+                .then((response) => {
+                    console.log(JSON.stringify(response.data));
+                    setChatData(response.data)
+                })
+                .catch((error) => {
+                    Alert.alert("An error occurred while registering");
+                    console.log("registration failed", error);
+                });
+        } catch (error) {
+            console.log("error in sending the message", error);
         }
     };
 
 
-    const handleTextInputFocus = () => {
-        Keyboard.dismiss(); // Dismiss keyboard immediately on focus (option 1)
+    useEffect(() => {
+        fetchMessages();
+    }, []);
+
+
+    const handleSendPress = async (messageType) => {
+        console.log("d")
+        try {
+            let params = {
+                "senderId": userId,
+                "recepientId": receiverId,
+                "messageType": "text",
+                "messageText": msg,
+                "timestamp": "2024-02-01T06:41:15.969Z",
+                "imageUrl": false
+            }
+            axios
+                .post("http://localhost:8000/messages", params)
+                .then((response) => {
+                    console.log(JSON.stringify(response.status));
+                    if (response.status == 200) {
+                        setMsg("")
+                        fetchMessages();
+                    }
+                })
+                .catch((error) => {
+                    Alert.alert(
+                        "Registration Error",
+                        "An error occurred while registering"
+                    );
+                    console.log("registration failed", error);
+                });
+        } catch (error) {
+            console.log("error in sending the message", error);
+        }
+    };
+
+    const formatTimestamp = (timestamp) => {
+        const date = new Date(timestamp);
+        const hours = date.getHours().toString().padStart(2, '0');
+        const minutes = date.getMinutes().toString().padStart(2, '0');
+        return `${hours}:${minutes}`;
     };
 
     return (
-
         <View style={styles.container}>
-            {/* <TouchableWithoutFeedback onPress={Keyboard.dismiss}>   */}
-
-            <FlatList
-                data={messageDetailsData}
-                keyExtractor={(item) => item.id}
-                renderItem={({ item }) => (
-                    <View style={[styles.messageContainer, item.sender === 'User' ? styles.userMessage : styles.otherMessage]}>
-                        <Text style={styles.content}>{item.content}</Text>
-                        <Text style={styles.timestamp}>{item.timestamp}</Text>
+            <ScrollView ref={scrollViewRef} contentContainerStyle={{ flexGrow: 1 }} onContentSizeChange={handleContentSizeChange} >
+                {chatData.map((item, index) => (
+                    <View key={item._id} style={[styles.messageContainer, item.recepientId === receiverId ? styles.userMessage : styles.otherMessage]}>
+                        <Text style={styles.content}>{item.message}</Text>
+                        <Text style={styles.timestamp}>{formatTimestamp(item.timeStamp)}</Text>
                     </View>
-                )}
-            />
+                ))}
+            </ScrollView>
 
             <KeyboardAvoidingView behavior={'padding'} keyboardVerticalOffset={100} >
                 <View style={styles.inputContainer}>
                     <TextInput
                         placeholder="Type a message"
                         style={styles.textInput}
+                        onChangeText={(text) => setMsg(text)}
+                        value={msg}
                     />
-                    <TouchableOpacity style={styles.sendButton} onPress={handleSendPress}>
+                    <TouchableOpacity style={styles.sendButton} onPress={() => { handleSendPress("text") }}>
                         <Text style={styles.sendButtonText}>Send</Text>
                     </TouchableOpacity>
                 </View>
             </KeyboardAvoidingView>
-
-
         </View>
     );
 };
@@ -123,6 +174,7 @@ const styles = StyleSheet.create({
     timestamp: {
         fontSize: 12,
         color: '#888888',
+        textAlign: 'right'
     },
     inputContainer: {
         flexDirection: 'row',
@@ -130,7 +182,6 @@ const styles = StyleSheet.create({
         paddingBottom: 20,
         borderColor: '#CCCCCC',
         paddingVertical: 10,
-
     },
     textInput: {
         flex: 1,

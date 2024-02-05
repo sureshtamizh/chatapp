@@ -1,16 +1,27 @@
 // Message.js
+import { useNavigation } from '@react-navigation/native';
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 
-const Messages = ({ sender, content, timestamp }) => {
+const Messages = ({ sender, content, timestamp, receiverid }) => {
+    const navigation = useNavigation();
+    const formatTimestamp = (timestamp) => {
+        const date = new Date(timestamp);
+        const hours = date.getHours().toString().padStart(2, '0');
+        const minutes = date.getMinutes().toString().padStart(2, '0');
+        return timestamp ? `${hours}:${minutes}` : "";
+    };
+
     return (
-        <View style={styles.messageContainer}>
+        <TouchableOpacity style={styles.messageContainer} onPress={() => navigation.navigate("chatdtls", {
+            recepientId: receiverid
+        })}>
             <View style={styles.title}>
                 <Text style={styles.sender}>{sender}</Text>
-                <Text style={styles.timestamp}>{timestamp}</Text>
+                <Text style={styles.timestamp}>{formatTimestamp(timestamp)}</Text>
             </View>
             <Text style={styles.content}>{content}</Text>
-        </View>
+        </TouchableOpacity>
     );
 };
 
