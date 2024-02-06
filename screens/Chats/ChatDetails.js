@@ -6,7 +6,10 @@ import axios from 'axios';
 import Pusher from 'pusher-js/react-native';
 import { getDataFromStorage } from '../../constants/storage';
 import { useRoute } from '@react-navigation/native';
-
+import socket from './socket';
+import ImagePicker from 'react-native-image-crop-picker';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+import RNFS from 'react-native-fs';
 
 
 const ChatDetails = () => {
@@ -14,6 +17,8 @@ const ChatDetails = () => {
     const textInputRef = useRef(null);
     const [chatData, setChatData] = useState([]);
     const [Messages, setMessages] = useState([]);
+    const [imageUri, setimageUri] = useState();
+
     const route = useRoute();
     const { recepientId } = route.params;
 
@@ -41,16 +46,6 @@ const ChatDetails = () => {
             const userId = await getDataFromStorage('USER_ID');
             setUserId(userId)
 
-            const pusher = new Pusher('976372772d32501ae512', {
-                cluster: 'ap2'
-            });
-            const channel = pusher.subscribe('chat');
-
-            channel.bind('message', (data) => {
-                console.log(data)
-                fetchMessages()
-            });
-
             let params = { "recepientId": recepientId, "senderId": userId }
             console.log(params);
 
@@ -69,42 +64,117 @@ const ChatDetails = () => {
         }
     };
 
+    useEffect(() => {
+        socket.on('message', (message) => {
+            console.log(message)
+        });
+        return () => {
+            socket.off('message');
+        };
+    }, []);
+
+
+    const pickImage = () => {
+        ImagePicker.openPicker({
+            cropping: true,
+            compressImageQuality: 0.15
+        }).then(image => {
+            console.log(JSON.stringify(image));
+            setimageUri(image.sourceURL)
+            convertBase64(image.sourceURL)
+                .then(base64String => {
+                    setimageUri(base64String)
+                    console.log(base64String);
+                    // Do something with the base64 string
+                    handleSendPress("image")
+                })
+                .catch(error => {
+                    console.error('Error converting to base64:', error);
+                });
+            console.log(res)
+            // handleSendPress("image")
+        }).catch((error) => {
+            console.log('error',);
+            var errorTemp = JSON.stringify(error)
+            console.log('errorTemp', errorTemp);
+        });
+
+    };
+    const convertBase64 = (imagePath) => {
+        return new Promise((resolve, reject) => {
+            RNFS.readFile(imagePath, 'base64')
+                .then(base64String => {
+                    resolve(base64String);
+                })
+                .catch(error => {
+                    reject(error);
+                });
+        });
+    };
 
     useEffect(() => {
+        if (!mountedRef.current) {
+            return;
+        }
+        // const pusher = new Pusher('976372772d32501ae512', {
+        //     cluster: 'ap2'
+        // });
+        // const channel = pusher.subscribe('chat');
+
+        // channel.bind('message', (data) => {
+        //     console.log(data)
+        //     fetchMessages()
+        // });
+
         fetchMessages();
     }, []);
 
 
+    const mountedRef = { current: true };
+
     const handleSendPress = async (messageType) => {
-        console.log("d")
+
         try {
-            let params = {
-                "senderId": userId,
-                "recepientId": receiverId,
-                "messageType": "text",
-                "messageText": msg,
-                "timestamp": "2024-02-01T06:41:15.969Z",
-                "imageUrl": false
+            const formData = new FormData();
+            formData.append("senderId", userId);
+            formData.append("recepientId", recepientId);
+
+            // Check the message type (image or text)
+            if (messageType === "image") {
+                formData.append("messageType", "image");
+                formData.append("imageFile", imageUri);
+            } else {
+                formData.append("messageType", messageType);
+                formData.append("messageText", msg);
             }
-            axios
-                .post("http://localhost:8000/messages", params)
-                .then((response) => {
-                    console.log(JSON.stringify(response.status));
-                    if (response.status == 200) {
-                        setMsg("")
-                        fetchMessages();
-                    }
-                })
-                .catch((error) => {
-                    Alert.alert(
-                        "Registration Error",
-                        "An error occurred while registering"
-                    );
-                    console.log("registration failed", error);
-                });
+
+            console.log(formData);
+
+            // Send the form data using axios
+            const response = await axios.post("http://localhost:8000/messages", formData);
+
+            // Check the response status
+            if (response.status === 200) {
+                setMsg("");
+                // fetchMessages();
+                console.log("Message sent successfully");
+            } else {
+                console.log("Unexpected response status:", response.status);
+            }
         } catch (error) {
-            console.log("error in sending the message", error);
+            // Handle errors
+            if (error.response) {
+                console.error("Server responded with non-2xx status:", error.response.status);
+            } else if (error.request) {
+                console.error("No response received from the server:", error.request);
+            } else {
+                console.error("Error setting up the request:", error.message);
+            }
+
+            // Additional error handling or logging as needed
+            console.log("Error in sending the message:", error);
         }
+
     };
 
     const formatTimestamp = (timestamp) => {
@@ -131,8 +201,12 @@ const ChatDetails = () => {
                         placeholder="Type a message"
                         style={styles.textInput}
                         onChangeText={(text) => setMsg(text)}
-                        value={msg}
+                        value={msg.toString()}
                     />
+
+                    <TouchableOpacity onPress={() => { pickImage() }}>
+                        <Icon name="photo-camera" size={28} style={{ marginRight: 10 }} color="grey" />
+                    </TouchableOpacity>
                     <TouchableOpacity style={styles.sendButton} onPress={() => { handleSendPress("text") }}>
                         <Text style={styles.sendButtonText}>Send</Text>
                     </TouchableOpacity>

@@ -12,6 +12,8 @@ target 'messanger' do
     :hermes_enabled => false
   )
 
+  pod 'RNImageCropPicker', :path => '../node_modules/react-native-image-crop-picker'
+
   target 'messangerTests' do
     inherit! :complete
     # Pods for testing

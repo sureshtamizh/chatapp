@@ -349,8 +349,19 @@ PODS:
     - React-Core
   - RNCMaskedView (0.1.11):
     - React
+  - RNFS (2.20.0):
+    - React-Core
   - RNGestureHandler (2.14.0):
     - React-Core
+  - RNImageCropPicker (0.40.2):
+    - React-Core
+    - React-RCTImage
+    - RNImageCropPicker/QBImagePickerController (= 0.40.2)
+    - TOCropViewController
+  - RNImageCropPicker/QBImagePickerController (0.40.2):
+    - React-Core
+    - React-RCTImage
+    - TOCropViewController
   - RNReanimated (3.6.1):
     - DoubleConversion
     - FBLazyVector
@@ -381,6 +392,9 @@ PODS:
   - RNScreens (3.29.0):
     - React-Core
     - React-RCTImage
+  - RNVectorIcons (10.0.3):
+    - React-Core
+  - TOCropViewController (2.6.1)
   - Yoga (1.14.0)
   - YogaKit (1.18.1):
     - Yoga (~> 1.14)
@@ -443,9 +457,12 @@ DEPENDENCIES:
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
   - "RNCAsyncStorage (from `../node_modules/@react-native-async-storage/async-storage`)"
   - "RNCMaskedView (from `../node_modules/@react-native-community/masked-view`)"
+  - RNFS (from `../node_modules/react-native-fs`)
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
+  - RNImageCropPicker (from `../node_modules/react-native-image-crop-picker`)
   - RNReanimated (from `../node_modules/react-native-reanimated`)
   - RNScreens (from `../node_modules/react-native-screens`)
+  - RNVectorIcons (from `../node_modules/react-native-vector-icons`)
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
 SPEC REPOS:
@@ -463,6 +480,7 @@ SPEC REPOS:
     - fmt
     - libevent
     - OpenSSL-Universal
+    - TOCropViewController
     - YogaKit
 
 EXTERNAL SOURCES:
@@ -532,12 +550,18 @@ EXTERNAL SOURCES:
     :path: "../node_modules/@react-native-async-storage/async-storage"
   RNCMaskedView:
     :path: "../node_modules/@react-native-community/masked-view"
+  RNFS:
+    :path: "../node_modules/react-native-fs"
   RNGestureHandler:
     :path: "../node_modules/react-native-gesture-handler"
+  RNImageCropPicker:
+    :path: "../node_modules/react-native-image-crop-picker"
   RNReanimated:
     :path: "../node_modules/react-native-reanimated"
   RNScreens:
     :path: "../node_modules/react-native-screens"
+  RNVectorIcons:
+    :path: "../node_modules/react-native-vector-icons"
   Yoga:
     :path: "../node_modules/react-native/ReactCommon/yoga"
 
@@ -588,12 +612,16 @@ SPEC CHECKSUMS:
   ReactCommon: af6dd2c8c0de935841fa809caf41b2093bb9075c
   RNCAsyncStorage: 618d03a5f52fbccb3d7010076bc54712844c18ef
   RNCMaskedView: 0e1bc4bfa8365eba5fbbb71e07fbdc0555249489
+  RNFS: 4ac0f0ea233904cb798630b3c077808c06931688
   RNGestureHandler: 4279931048471f17faf46d912b2e96e10f1da99b
+  RNImageCropPicker: d9616a0cb9b72e8551ff94a7a5021fbd29050aa5
   RNReanimated: ca978bf0d4da2d47255c6ef923c15006f48fa6b2
   RNScreens: fa9b582d85ae5d62c91c66003b5278458fed7aaa
+  RNVectorIcons: bc7ee28cadf39c77a49232a14738dfce690f66cd
+  TOCropViewController: edfd4f25713d56905ad1e0b9f5be3fbe0f59c863
   Yoga: 3f5bfc54ce164fcd5b5d7f9f4232182d6298dd56
   YogaKit: f782866e155069a2cca2517aafea43200b01fd5a
 
-PODFILE CHECKSUM: a739ec7d560b52c278da73e914b13db72e6749e9
+PODFILE CHECKSUM: 9d4029f231643b64b51380ab862f8413575a7fe4
 
-COCOAPODS: 1.14.3
+COCOAPODS: 1.15.0

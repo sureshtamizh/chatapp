@@ -1,17 +1,45 @@
 // ChatList.js
-import React, { useEffect, useState } from 'react';
-import { FlatList, View, StyleSheet, Alert, TouchableOpacity } from 'react-native';
+import React, { useCallback, useEffect, useLayoutEffect, useState } from 'react';
+import { FlatList, View, StyleSheet, Alert, TouchableOpacity, Image } from 'react-native';
 import Messages from './Messages';
-import { getChatList } from '../../services';
-import { getDataFromStorage } from '../../constants/storage';
+import { getDataFromStorage, setDataToStorage } from '../../constants/storage';
 import axios from 'axios';
+import { useFocusEffect } from '@react-navigation/native';
 
 const ChatList = ({ navigation }) => {
     const [chatList, setChatList] = useState([]);
 
+
+    useLayoutEffect(() => {
+        navigation.setOptions({
+            headerTitle: "Home",
+            headerRight: () => (
+                <View style={styles.avatarContainer}>
+                    <Image source={{ uri: "https://www.pngall.com/wp-content/uploads/5/User-Profile-PNG.png" }} style={styles.avatarImage} />
+                </View>
+            ),
+        });
+    }, []);
+
+    useFocusEffect(
+        React.useCallback(() => {
+            // Additional code related to focus effect, if needed
+            return () => {
+                fetchChatList();
+            };
+        }, [])
+    );
+
     useEffect(() => {
         fetchChatList();
     }, []);
+
+    const memoizedFetchChatList = useCallback(() => {
+        fetchChatList();
+    }, []); // Pass an empty dependency array if no dependencies are needed
+
+    // Use useFocusEffect with the memoized function
+    useFocusEffect(memoizedFetchChatList);
 
     const fetchChatList = async () => {
         try {
@@ -42,7 +70,13 @@ const ChatList = ({ navigation }) => {
 
                 keyExtractor={(item) => item._id.toString()}  // Assuming 'id' is a number; adjust accordingly
                 renderItem={({ item }) => (
-                    <Messages sender={item.name} content={item.lastMessage} timestamp={item.lastMessageTimestamp} receiverid={item._id} />
+                    <View >
+
+                        <Messages sender={item.name} content={item.lastMessage} timestamp={item.lastMessageTimestamp} receiverid={item._id} image={item.image} />
+
+                    </View>
+
+
                 )}
                 showsVerticalScrollIndicator={false}
             />
@@ -53,7 +87,20 @@ const ChatList = ({ navigation }) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fff',
+        backgroundColor: '#fff'
+    },
+    avatarContainer: {
+        width: 35, // Set the width and height as per your requirements for the circular avatar
+        height: 35,
+        borderRadius: 40, // Make it half of the width/height to create a circular shape
+        overflow: 'hidden',
+        borderWidth: 0.7,
+        margin: 10 // Clip the image to the rounded shape
+    },
+    avatarImage: {
+        flex: 1, // Ensure the image takes the full container space
+        width: null, // Make sure the width and height are null to stretch the image
+        height: null,
     },
 });
 
