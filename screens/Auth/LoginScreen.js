@@ -44,6 +44,7 @@ const LoginScreen = ({ navigation }) => {
                     console.log(JSON.stringify(response.data))
                     setDataToStorage('TOKEN_KEY', response.data.token);
                     setDataToStorage('USER_ID', response.data.userId);
+                    setDataToStorage('USER_PROF', response.data.image);
                     navigation.replace("chat");
                 }
                 // Alert.alert(

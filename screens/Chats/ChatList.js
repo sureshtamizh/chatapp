@@ -11,20 +11,32 @@ const ChatList = ({ navigation }) => {
 
 
     useLayoutEffect(() => {
-        navigation.setOptions({
-            headerTitle: "Home",
-            headerRight: () => (
-                <View style={styles.avatarContainer}>
-                    <Image source={{ uri: "https://www.pngall.com/wp-content/uploads/5/User-Profile-PNG.png" }} style={styles.avatarImage} />
-                </View>
-            ),
-        });
-    }, []);
+        const setHeaderOptions = async () => {
+            const userImage = await getDataFromStorage('USER_PROF');
+            navigation.setOptions({
+                headerTitle: "Home",
+                headerRight: () => (
+                    <TouchableOpacity style={styles.avatarContainer} onPress={() => navigation.navigate("profile")}>
+                        <Image source={{ uri: userImage }} style={styles.avatarImage} />
+                    </TouchableOpacity>
+                ),
+            });
+        };
+
+        setHeaderOptions(); // Call the function to set header options
+
+        // Cleanup function if needed
+        return () => {
+            // Your cleanup code here, if necessary
+        };
+    }, [navigation]);
+
 
     useFocusEffect(
         React.useCallback(() => {
             // Additional code related to focus effect, if needed
             return () => {
+
                 fetchChatList();
             };
         }, [])
@@ -67,16 +79,11 @@ const ChatList = ({ navigation }) => {
         <TouchableOpacity style={styles.container}  >
             <FlatList
                 data={chatList}
-
                 keyExtractor={(item) => item._id.toString()}  // Assuming 'id' is a number; adjust accordingly
                 renderItem={({ item }) => (
                     <View >
-
-                        <Messages sender={item.name} content={item.lastMessage} timestamp={item.lastMessageTimestamp} receiverid={item._id} image={item.image} />
-
+                        <Messages sender={item.name} content={item.lastMessage} timestamp={item.lastMessageTimestamp} receiverid={item._id} type={item.messageType} image={item.image} />
                     </View>
-
-
                 )}
                 showsVerticalScrollIndicator={false}
             />

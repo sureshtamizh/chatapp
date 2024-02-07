@@ -10,6 +10,7 @@ import ChatDetails from './screens/Chats/ChatDetails';
 import RegisterScreen from './screens/Auth/Register';
 import { getDataFromStorage } from './constants/storage';
 import io from 'socket.io-client';
+import Profile from './screens/Setting/Profile';
 
 const Stack = createStackNavigator();
 
@@ -37,6 +38,8 @@ const App = () => {
 
         <Stack.Screen name="chat" component={ChatList} />
         <Stack.Screen name="chatdtls" component={ChatDetails} />
+        <Stack.Screen name="profile" component={Profile} options={{ headerBackTitle: 'Back', headerTitle: 'Profile' }} />
+
 
       </Stack.Navigator>
     </NavigationContainer>

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { View, Text, FlatList, StyleSheet, TextInput, TouchableOpacity, KeyboardAvoidingView, TouchableWithoutFeedback, Keyboard, Alert, ScrollView } from 'react-native';
 import { COLORS } from '../../constants/COLOR';
 import { getChatDetailsList } from '../../services';
@@ -10,17 +10,19 @@ import socket from './socket';
 import ImagePicker from 'react-native-image-crop-picker';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import RNFS from 'react-native-fs';
+import { Image } from 'react-native';
 
 
-const ChatDetails = () => {
+const ChatDetails = ({ navigation }) => {
     const [msg, setMsg] = useState([]);
     const textInputRef = useRef(null);
     const [chatData, setChatData] = useState([]);
     const [Messages, setMessages] = useState([]);
     const [imageUri, setimageUri] = useState();
 
+
     const route = useRoute();
-    const { recepientId } = route.params;
+    const { recepientId, userName } = route.params;
 
     const [userId, setUserId] = useState();
     const [receiverId, setreceiverId] = useState(recepientId);
@@ -36,6 +38,11 @@ const ChatDetails = () => {
             scrollViewRef.current.scrollToEnd({ animated: false })
         }
     }
+    useLayoutEffect(() => {
+        navigation.setOptions({
+            title: userName, // Set the title to the userName
+        });
+    }, [navigation, userName]);
 
     const handleContentSizeChange = () => {
         scrollToBottom();
@@ -64,6 +71,16 @@ const ChatDetails = () => {
         }
     };
 
+    const getImage = (image) => {
+        const baseUrl =
+            "/Users/suresh/Documents/nodejsApi/tamchat/files/";
+        const imageUrl = image;
+        const filename = imageUrl.split("/").pop();
+        const source = { uri: baseUrl + filename };
+        console.log(source)
+        return source;
+
+    }
     useEffect(() => {
         socket.on('message', (message) => {
             console.log(message)
@@ -81,17 +98,18 @@ const ChatDetails = () => {
         }).then(image => {
             console.log(JSON.stringify(image));
             setimageUri(image.sourceURL)
-            convertBase64(image.sourceURL)
-                .then(base64String => {
-                    setimageUri(base64String)
-                    console.log(base64String);
-                    // Do something with the base64 string
-                    handleSendPress("image")
-                })
-                .catch(error => {
-                    console.error('Error converting to base64:', error);
-                });
-            console.log(res)
+            handleSendPress("image", image.sourceURL)
+            // convertBase64(image.sourceURL)
+            //     .then(base64String => {
+            //         setimageUri(base64String)
+            //         console.log(base64String);
+            //         // Do something with the base64 string
+            //         handleSendPress("image")
+            //     })
+            //     .catch(error => {
+            //         console.error('Error converting to base64:', error);
+            //     });
+            // console.log(res)
             // handleSendPress("image")
         }).catch((error) => {
             console.log('error',);
@@ -99,17 +117,6 @@ const ChatDetails = () => {
             console.log('errorTemp', errorTemp);
         });
 
-    };
-    const convertBase64 = (imagePath) => {
-        return new Promise((resolve, reject) => {
-            RNFS.readFile(imagePath, 'base64')
-                .then(base64String => {
-                    resolve(base64String);
-                })
-                .catch(error => {
-                    reject(error);
-                });
-        });
     };
 
     useEffect(() => {
@@ -132,17 +139,21 @@ const ChatDetails = () => {
 
     const mountedRef = { current: true };
 
-    const handleSendPress = async (messageType) => {
+    const handleSendPress = async (messageType, imgUrl) => {
 
         try {
             const formData = new FormData();
             formData.append("senderId", userId);
             formData.append("recepientId", recepientId);
-
+            console.log(imageUri)
             // Check the message type (image or text)
             if (messageType === "image") {
                 formData.append("messageType", "image");
-                formData.append("imageFile", imageUri);
+                formData.append("imageFile", {
+                    uri: imgUrl,
+                    name: "image.jpg",
+                    type: "image/jpeg",
+                });
             } else {
                 formData.append("messageType", messageType);
                 formData.append("messageText", msg);
@@ -189,7 +200,12 @@ const ChatDetails = () => {
             <ScrollView ref={scrollViewRef} contentContainerStyle={{ flexGrow: 1 }} onContentSizeChange={handleContentSizeChange} >
                 {chatData.map((item, index) => (
                     <View key={item._id} style={[styles.messageContainer, item.recepientId === receiverId ? styles.userMessage : styles.otherMessage]}>
-                        <Text style={styles.content}>{item.message}</Text>
+                        {item.messageType === "image" ?
+                            <Image
+                                source={getImage(item.imageUrl)}
+                                style={{ width: 200, height: 200, borderRadius: 7 }}
+                            /> :
+                            <Text style={styles.content}>{item.message}</Text>}
                         <Text style={styles.timestamp}>{formatTimestamp(item.timeStamp)}</Text>
                     </View>
                 ))}
@@ -248,7 +264,8 @@ const styles = StyleSheet.create({
     timestamp: {
         fontSize: 12,
         color: '#888888',
-        textAlign: 'right'
+        textAlign: 'right',
+        marginTop: 3
     },
     inputContainer: {
         flexDirection: 'row',

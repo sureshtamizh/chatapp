@@ -2,8 +2,9 @@
 import { useNavigation } from '@react-navigation/native';
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
-const Messages = ({ sender, content, timestamp, receiverid, image }) => {
+const Messages = ({ sender, content, timestamp, receiverid, type, image }) => {
     const navigation = useNavigation();
     const formatTimestamp = (timestamp) => {
         const date = new Date(timestamp);
@@ -19,16 +20,22 @@ const Messages = ({ sender, content, timestamp, receiverid, image }) => {
                     <Image source={{ uri: image }} style={styles.avatarImage} />
                 </View>
                 <TouchableOpacity style={styles.title} onPress={() => navigation.navigate("chatdtls", {
-                    recepientId: receiverid
+                    recepientId: receiverid,
+                    userName: sender
                 })}>
                     <View>
                         <Text style={styles.sender}>{sender}</Text>
-                        <Text style={styles.content}>{content}</Text>
+                        {type == "image" ?
+                            <View style={{ flexDirection: 'row', justifyContent: 'center', alignContent: 'center', alignItems: 'center' }}>
+                                <Icon name="photo-camera" size={15} color="grey" style={{ paddingRight: 5 }} />
+                                <Text style={styles.content}>image</Text>
+                            </View>
+                            :
+                            <Text style={styles.content}>{content}</Text>}
                     </View>
                     <Text style={styles.timestamp}>{formatTimestamp(timestamp)}</Text>
                 </TouchableOpacity>
             </View>
-
         </View>
     );
 };
