@@ -4,7 +4,7 @@ import { COLORS } from '../../constants/COLOR';
 import { getChatDetailsList } from '../../services';
 import axios from 'axios';
 import Pusher from 'pusher-js/react-native';
-import { getDataFromStorage } from '../../constants/storage';
+import { getDataFromStorage } from '../../constants/storage.js';
 import { useRoute } from '@react-navigation/native';
 import socket from './socket';
 import ImagePicker from 'react-native-image-crop-picker';

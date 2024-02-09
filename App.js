@@ -8,7 +8,7 @@ import LoginScreen from './screens/Auth/LoginScreen';
 import ChatList from './screens/Chats/ChatList';
 import ChatDetails from './screens/Chats/ChatDetails';
 import RegisterScreen from './screens/Auth/Register';
-import { getDataFromStorage } from './constants/storage';
+import { getDataFromStorage } from './constants/storage.js';
 import io from 'socket.io-client';
 import Profile from './screens/Setting/Profile';
 

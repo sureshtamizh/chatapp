@@ -2,7 +2,7 @@
 import React, { useCallback, useEffect, useLayoutEffect, useState } from 'react';
 import { FlatList, View, StyleSheet, Alert, TouchableOpacity, Image } from 'react-native';
 import Messages from './Messages';
-import { getDataFromStorage, setDataToStorage } from '../../constants/storage';
+import { getDataFromStorage, setDataToStorage } from '../../constants/storage.js';
 import axios from 'axios';
 import { useFocusEffect } from '@react-navigation/native';
 

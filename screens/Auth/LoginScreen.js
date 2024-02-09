@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Alert, Pressable, ActivityIndicator } from 'react-native';
-import { getDataFromStorage, setDataToStorage } from '../../constants/storage';
+import { setDataToStorage } from '../../constants/storage';
 import axios from 'axios';
 
 const LoginScreen = ({ navigation }) => {

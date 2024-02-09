@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, Image, Button, StyleSheet, Pressable } from 'react-native';
-import { getDataFromStorage } from '../../constants/storage';
+import { getDataFromStorage } from '../../constants/storage.js';
 import axios from 'axios';
 
 const Profile = () => {
