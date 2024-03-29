@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Alert, Pressable, ActivityIndicator } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, Alert, Pressable, ActivityIndicator, Image } from 'react-native';
 import { setDataToStorage } from '../../constants/storage';
 import axios from 'axios';
 
@@ -65,6 +65,9 @@ const LoginScreen = ({ navigation }) => {
 
     return (
         <View style={styles.container}>
+            <View style={{ alignItems: 'center', marginBottom: 50 }}>
+                <Image source={require('../../assets/logo.png')} style={{ width: 150, height: 150 }} />
+            </View>
             <Text style={styles.header}>Login</Text>
             <TextInput
                 style={styles.input}
@@ -102,6 +105,7 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         padding: 25,
+        backgroundColor: '#fff'
     },
     header: {
         fontSize: 32,

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, Alert, Pressable, ActivityIndicator } from 'react-native';
+import { View, Text, TextInput, Image, StyleSheet, Alert, Pressable, ActivityIndicator } from 'react-native';
 
 import axios from 'axios';
 
@@ -62,6 +62,9 @@ const RegisterScreen = ({ navigation }) => {
 
     return (
         <View style={styles.container}>
+            <View style={{ alignItems: 'center', marginBottom: 50 }}>
+                <Image source={require('../../assets/logo.png')} style={{ width: 150, height: 150 }} />
+            </View>
             <Text style={styles.header}>Create an Account</Text>
             <TextInput
                 style={styles.input}
@@ -104,6 +107,7 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         padding: 16,
+        backgroundColor: '#fff'
     },
     header: {
         fontSize: 32,

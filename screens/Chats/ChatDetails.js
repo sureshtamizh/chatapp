@@ -123,15 +123,7 @@ const ChatDetails = ({ navigation }) => {
         if (!mountedRef.current) {
             return;
         }
-        // const pusher = new Pusher('976372772d32501ae512', {
-        //     cluster: 'ap2'
-        // });
-        // const channel = pusher.subscribe('chat');
 
-        // channel.bind('message', (data) => {
-        //     console.log(data)
-        //     fetchMessages()
-        // });
 
         fetchMessages();
     }, []);
